@@ -111,7 +111,7 @@ router.get(`${basePath}/:id`, (req, res) => {
  *   post:
  *     tags:
  *       - Contacts
- *     description: Add a concat to the DB by providing first_name, last_name, job and phone_number
+ *     description: Add a concat to the DB by providing first_name, last_name, job and description
  *     summary: Create new contact
  *     requestBody:
  *       description: The request body requires a property "contact", which is nothing but an object containing the new contact's info
@@ -126,9 +126,9 @@ router.get(`${basePath}/:id`, (req, res) => {
  *                 type: string
  *               job:
  *                 type: string
- *               phone_number:
+ *               description:
  *                 type: string              
- *           example: { contact: { first_name: 'Anakin', last_name: 'Skywalker', job: 'Jedi Knight', phone_number: '09843432' } }
+ *           example: { contact: { first_name: 'Anakin', last_name: 'Skywalker', job: 'Jedi Knight', description: 'The Chosen one' } }
  *     responses:
  *       '201':
  *         description: Returns the newly added contact in the data field
@@ -146,7 +146,7 @@ router.get(`${basePath}/:id`, (req, res) => {
  *             example:
  *               statusCode: 201,
  *               message: 'Contact successfully added'
- *               data: { id: 1, first_name: 'Anakin', last_name: 'Skywalker', job: 'Jedi Knight' }
+ *               data: { id: 1, first_name: 'Anakin', last_name: 'Skywalker', job: 'Jedi Knight', description: 'The Chosen one' }
  */
 router.post(basePath, (req, res) => {
   const { contact } = req.body;
@@ -156,7 +156,7 @@ router.post(basePath, (req, res) => {
     first_name: contact.first_name,
     last_name: contact.last_name,
     job: contact.job,
-    phone_number: contact.phone_number,
+    description: contact.description,
   };
 
   writeContacts([...contacts, newContact]);
@@ -192,7 +192,7 @@ router.post(basePath, (req, res) => {
  *                 type: string
  *               job:
  *                 type: string
- *               phone_number:
+ *               description:
  *                 type: string              
  *           example: { info: { first_name: 'Anakin' } }
  *     responses:
@@ -212,7 +212,7 @@ router.post(basePath, (req, res) => {
  *             example:
  *               statusCode: 201,
  *               message: 'Contact correctly updated'
- *               data: { id: 1, first_name: 'Anakin', last_name: 'Skywalker', job: 'Jedi Knight' }
+ *               data: { id: 1, first_name: 'Anakin', last_name: 'Skywalker', job: 'Jedi Knight', description: 'The Chose one' }
 *       '404':
  *         description: Contact not found
  *         content:
@@ -278,7 +278,7 @@ router.patch(`${basePath}/:id`, (req, res) => {
  *             example:
  *               statusCode: 200,
  *               message: 'Contact successfully retrieved'
- *               data: { id: 1, first_name: 'Anakin', last_name: 'Skywalker', job: 'Jedi Knight' }
+ *               data: { id: 1, first_name: 'Anakin', last_name: 'Skywalker', job: 'Jedi Knight', description: 'The Chosen one' }
  *       '404':
  *         description: Contact not found
  *         content:
