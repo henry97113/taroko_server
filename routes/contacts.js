@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getContacts, writeContacts } = require('../db/helpers');
+const redis = require('../lib/redis');
 
 const basePath = '/contacts';
 
@@ -35,11 +35,16 @@ const basePath = '/contacts';
  *                 { id: 2, first_name: 'Boba', last_name: 'Fett', job: 'Bounty Hunter', description: 'Son of Jango Fett' },
  *               ]
  */
-router.get(basePath, (req, res) => {
+router.get(basePath, async (req, res) => {
+  const ids = (await redis.getIds()).map((key) => parseInt(key)).sort();
+  const contacts = await Promise.all(ids.map(async (id) => {
+    return await redis.getContact(id.toString());
+  }));
+
   return res.status(200).json({
     statusCode: 200,
     message: 'Successfully retrieved the contacts list',
-    data: getContacts(),
+    data: contacts,
   });
 });
 
@@ -94,9 +99,9 @@ router.get(basePath, (req, res) => {
  *               message: 'Contact not found'
  *               data: {}          
  */
-router.get(`${basePath}/:id`, (req, res) => {
+router.get(`${basePath}/:id`, async (req, res) => {
   const { id } = req.params;
-  const contact = getContacts().find((contact) => contact.id === parseInt(id));
+  const contact = await redis.getContact(id);
   if (!contact) {
     return res.status(404).json({ statusCode: 404, message: 'Contact not found', data: {}});
   }
@@ -148,18 +153,19 @@ router.get(`${basePath}/:id`, (req, res) => {
  *               message: 'Contact successfully added'
  *               data: { id: 1, first_name: 'Anakin', last_name: 'Skywalker', job: 'Jedi Knight', description: 'The Chosen one' }
  */
-router.post(basePath, (req, res) => {
+router.post(basePath, async (req, res) => {
   const { contact } = req.body;
-  const contacts = getContacts();
+  const id = await redis.getNextId();
   const newContact = {
-    id: contacts.length + 1,
+    id,
     first_name: contact.first_name,
     last_name: contact.last_name,
     job: contact.job,
     description: contact.description,
   };
 
-  writeContacts([...contacts, newContact]);
+
+  await redis.addContact(id, newContact);
 
   return res.status(201).json({ statusCode: 201, message: 'Contact successfully added', data: newContact });
 });
@@ -231,18 +237,17 @@ router.post(basePath, (req, res) => {
  *               message: 'Contact not found'
  *               data: {}   
  */
-router.patch(`${basePath}/:id`, (req, res) => {
+router.patch(`${basePath}/:id`, async (req, res) => {
   const { id } = req.params;
   const { info } = req.body;
-  const contacts = getContacts();
-  const contact = contacts.find((contact) => contact.id === parseInt(id));
+  const contact = await redis.getContact(id);
   if (!contact) {
     return res.status(404).json({ statusCode: 404, message: 'Contact not found', data: {}});
   }
 
   const updatedContact = {...contact, ...info};
-  writeContacts(contacts.map((contact) => contact.id === updatedContact.id ? updatedContact : contact));
 
+  await redis.addContact(updatedContact.id, updatedContact);
   return res.status(201).json({ statusCode: 201, message: 'Contact correctly updated', data: updatedContact });
 });
 
@@ -297,16 +302,13 @@ router.patch(`${basePath}/:id`, (req, res) => {
  *               message: 'Contact not found'
  *               data: {}          
  */
-router.delete(`${basePath}/:id`, (req, res) => {
+router.delete(`${basePath}/:id`, async (req, res) => {
   const { id } = req.params;
-  const contacts = getContacts();
-  const contact = contacts.find((contact) => contact.id === parseInt(id));
+  const contact = await redis.deleteContact(id);
   if (!contact) {
     return res.status(404).json({ statusCode: 404, message: 'Contact not found', data: {} });
   }
 
-  const filteredContacts = getContacts().filter((contact) => contact.id !== parseInt(id));
-  writeContacts(filteredContacts);
   return res.status(200).json({ statusCode: 200, message: 'Contact correctly deleted', data: contact });
 });
 

@@ -32,6 +32,6 @@
     "first_name": "Darth",
     "last_name": "Vader",
     "job": "Sith lord",
-    "phone_number": "I am your father!"
+    "description": "I am your father!"
   }
 ]

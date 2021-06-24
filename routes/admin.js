@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { resetContacts } = require('../db/helpers');
+const redis = require('../lib/redis');
 
 const basePath = '/admin';
 
-router.post(basePath, (req, res) => {
-  resetContacts();
+router.post(basePath, async (req, res) => {
+  await redis.resetDB();
   return res.status(200).json({
     statusCode: 200,
     message: 'Successfully reset the db',

@@ -8,6 +8,8 @@ const swaggerUi = require('swagger-ui-express');
 const indexRouter = require('./routes/index');
 const contactsRouter = require('./routes/contacts');
 const adminRouter = require('./routes/admin');
+const redis = require('redis');
+const client = redis.createClient('redis://:pc047b3f4c31995dd62188df5ce1dfaf26672df9bf47ec469aefdb9eef482d92f@ec2-54-211-207-92.compute-1.amazonaws.com:26849');
 
 const specs = require('./docs/swaggerDocs');
 
