@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const redis = require('../lib/redis');
+const { getContacts, writeContacts } = require('../db/helpers');
 
 const basePath = '/contacts';
 
@@ -36,15 +36,10 @@ const basePath = '/contacts';
  *               ]
  */
 router.get(basePath, async (req, res) => {
-  const ids = (await redis.getIds()).map((key) => parseInt(key)).sort();
-  const contacts = await Promise.all(ids.map(async (id) => {
-    return await redis.getContact(id.toString());
-  }));
-
   return res.status(200).json({
     statusCode: 200,
     message: 'Successfully retrieved the contacts list',
-    data: contacts,
+    data: getContacts(),
   });
 });
 
@@ -101,7 +96,7 @@ router.get(basePath, async (req, res) => {
  */
 router.get(`${basePath}/:id`, async (req, res) => {
   const { id } = req.params;
-  const contact = await redis.getContact(id);
+  const contact = getContacts().find((contact) => contact.id == id);
   if (!contact) {
     return res.status(404).json({ statusCode: 404, message: 'Contact not found', data: {}});
   }
@@ -155,19 +150,21 @@ router.get(`${basePath}/:id`, async (req, res) => {
  */
 router.post(basePath, async (req, res) => {
   const { contact } = req.body;
-  const id = await redis.getNextId();
+  const contacts = getContacts();
+
   const newContact = {
-    id,
+    id: contacts.length + 1,
     first_name: contact.first_name,
     last_name: contact.last_name,
     job: contact.job,
     description: contact.description,
   };
+  contacts.push(newContact);
 
-
-  await redis.addContact(id, newContact);
+  writeContacts(contacts);
 
   return res.status(201).json({ statusCode: 201, message: 'Contact successfully added', data: newContact });
+
 });
 
 /* PATCH update contact */
@@ -240,15 +237,21 @@ router.post(basePath, async (req, res) => {
 router.patch(`${basePath}/:id`, async (req, res) => {
   const { id } = req.params;
   const { info } = req.body;
-  const contact = await redis.getContact(id);
-  if (!contact) {
-    return res.status(404).json({ statusCode: 404, message: 'Contact not found', data: {}});
+
+  const contacts = getContacts();
+
+  // this step is not necessary for the update but it's handy to check whether the contact exists first or not.
+  const elem = contacts.find((contact) => contact.id == id);
+
+  if (!elem) {
+    return res.status(404).json({ statusCode: 404, message: 'Contact not found', data: {} });
   }
 
-  const updatedContact = {...contact, ...info};
+  const updatedContact = { ...elem, ...info };
 
-  await redis.addContact(updatedContact.id, updatedContact);
-  return res.status(201).json({ statusCode: 201, message: 'Contact correctly updated', data: updatedContact });
+  writeContacts(contacts.map((contact) => contact.id === updatedContact.id ? updatedContact : contact))
+
+  return res.status(201).json({ stasusCode: 201, message: 'Contact correctly updated', data: updatedContact });
 });
 
 /* DELETE delete contact */
@@ -304,12 +307,21 @@ router.patch(`${basePath}/:id`, async (req, res) => {
  */
 router.delete(`${basePath}/:id`, async (req, res) => {
   const { id } = req.params;
-  const contact = await redis.deleteContact(id);
-  if (!contact) {
+
+  const contacts = getContacts();
+
+  // this step is not necessary for the update but it's handy to check whether the contact exists first or not.
+  const elem = contacts.find((contact) => contact.id == id);
+
+  if (!elem) {
     return res.status(404).json({ statusCode: 404, message: 'Contact not found', data: {} });
   }
 
-  return res.status(200).json({ statusCode: 200, message: 'Contact correctly deleted', data: contact });
+  const newContacts = contacts.filter((contact) => contact.id != id);
+  
+  writeContacts( newContacts);
+
+  return res.status(200).json({ statusCode: 200, message: 'Contact correctly deleted', data: elem });
 });
 
 module.exports = router;
