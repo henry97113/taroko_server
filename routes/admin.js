@@ -31,10 +31,7 @@ const basePath = '/admin';
  *             example:
  *               statusCode: 200,
  *               message: 'Successfully reset the db'
- *               data: [
- *                 { id: 1, first_name: 'Anakin', last_name: 'Skywalker', job: 'Jedi Knight', description: 'The Chosen one' },
- *                 { id: 2, first_name: 'Boba', last_name: 'Fett', job: 'Bounty Hunter', description: 'Son of Jango Fett' },
- *               ]
+ *               data: {}
  */
 router.post(basePath, async (req, res) => {
   writeContacts(contacts);

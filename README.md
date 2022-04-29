@@ -12,7 +12,7 @@ POST /api/admin
 
 ## Local Development
 
-Simply clone/fork the repo and run
+Simply fork the repo and run
 
 ```
 npm install
