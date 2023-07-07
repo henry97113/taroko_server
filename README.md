@@ -2,7 +2,7 @@
 
 Sample servers allowing for basic CRUD operations on a small json database of contacts
 
-Go to https://localhost:3000/api-docs for Swagger docs and test the endpoints
+Go to http://localhost:3000/api-docs for Swagger docs and test the endpoints
 
 There is an admin endpoint that resets the DB to its original state:
 ```
