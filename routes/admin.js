@@ -33,7 +33,7 @@ const basePath = '/admin';
  *               message: 'Successfully reset the db'
  *               data: {}
  */
-router.post(basePath, async (req, res) => {
+router.post(basePath, (req, res) => {
   writeContacts(contacts);
   return res.status(200).json({
     statusCode: 200,

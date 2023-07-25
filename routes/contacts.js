@@ -35,7 +35,7 @@ const basePath = '/contacts';
  *                 { id: 2, first_name: 'Boba', last_name: 'Fett', job: 'Bounty Hunter', description: 'Son of Jango Fett' },
  *               ]
  */
-router.get(basePath, async (req, res) => {
+router.get(basePath, (req, res) => {
   return res.status(200).json({
     statusCode: 200,
     message: 'Successfully retrieved the contacts list',
@@ -94,7 +94,7 @@ router.get(basePath, async (req, res) => {
  *               message: 'Contact not found'
  *               data: {}          
  */
-router.get(`${basePath}/:id`, async (req, res) => {
+router.get(`${basePath}/:id`, (req, res) => {
   const { id } = req.params;
   const contact = getContacts().find((contact) => contact.id == id);
   if (!contact) {
@@ -148,7 +148,7 @@ router.get(`${basePath}/:id`, async (req, res) => {
  *               message: 'Contact successfully added'
  *               data: { id: 1, first_name: 'Anakin', last_name: 'Skywalker', job: 'Jedi Knight', description: 'The Chosen one' }
  */
-router.post(basePath, async (req, res) => {
+router.post(basePath, (req, res) => {
   const { contact } = req.body;
   const contacts = getContacts();
 
@@ -234,7 +234,7 @@ router.post(basePath, async (req, res) => {
  *               message: 'Contact not found'
  *               data: {}   
  */
-router.patch(`${basePath}/:id`, async (req, res) => {
+router.patch(`${basePath}/:id`, (req, res) => {
   const { id } = req.params;
   const { info } = req.body;
 
@@ -305,7 +305,7 @@ router.patch(`${basePath}/:id`, async (req, res) => {
  *               message: 'Contact not found'
  *               data: {}          
  */
-router.delete(`${basePath}/:id`, async (req, res) => {
+router.delete(`${basePath}/:id`, (req, res) => {
   const { id } = req.params;
 
   const contacts = getContacts();
