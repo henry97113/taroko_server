@@ -251,7 +251,7 @@ router.patch(`${basePath}/:id`, (req, res) => {
 
   writeContacts(contacts.map((contact) => contact.id === updatedContact.id ? updatedContact : contact))
 
-  return res.status(201).json({ stasusCode: 201, message: 'Contact correctly updated', data: updatedContact });
+  return res.status(201).json({ statusCode: 201, message: 'Contact correctly updated', data: updatedContact });
 });
 
 /* DELETE delete contact */
