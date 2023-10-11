@@ -16,7 +16,7 @@ Simply fork the repo and run
 
 ```
 npm install
-npm run dev
+npm run start-prod
 ```
 
 You need a Node version >= 12.18.4
